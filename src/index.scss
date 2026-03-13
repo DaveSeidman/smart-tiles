@@ -1,0 +1,346 @@
+@use "sass:color";
+
+// Variables
+$bg-dark: #1a1a2e;
+$bg-card: #16213e;
+$accent: #e94560;
+$accent-light: #f06a83;
+$accent-glow: rgba(233, 69, 96, 0.4);
+$text-light: #eaeaea;
+$text-muted: #8892a0;
+$tile-bg: #0f3460;
+$tile-bg-light: #134170;
+$tile-bg-lighter: #185080;
+$tile-border: #1a4a7a;
+$tile-border-light: #2a6a9a;
+$exit-bg: #2d5a3d;
+$exit-bg-light: #3a7050;
+$exit-border: #4a9c6d;
+$exit-border-light: #5ab87d;
+
+// Reset & base
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: $bg-dark;
+  color: $text-light;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+// Header
+header {
+  text-align: center;
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, $text-light 0%, $accent 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: $text-muted;
+    font-size: 1rem;
+  }
+}
+
+// Controls
+.controls {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  background: $bg-card;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    span {
+      color: $text-muted;
+      font-size: 0.9rem;
+    }
+
+    input[type="number"] {
+      width: 70px;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid $tile-border;
+      border-radius: 6px;
+      background: $tile-bg;
+      color: $text-light;
+      font-size: 1rem;
+      text-align: center;
+
+      &:focus {
+        outline: none;
+        border-color: $accent;
+        box-shadow: 0 0 0 3px $accent-glow;
+      }
+    }
+  }
+
+  .reset-btn {
+    padding: 0.5rem 1rem;
+    background: $accent;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $accent-light;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Toggles
+.toggles {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $accent;
+    cursor: pointer;
+  }
+
+  span {
+    color: $text-muted;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+
+  &:has(input:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    input,
+    span {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// Status
+.status {
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+
+  .hint {
+    color: $text-muted;
+    font-size: 0.95rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .running {
+    color: #4ade80;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+// Floor grid
+.floor {
+  padding: 1rem;
+  background: linear-gradient(145deg, rgba(15, 52, 96, 0.5), rgba(22, 33, 62, 0.8));
+  border-radius: 16px;
+  border: 2px solid $tile-border;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  max-width: 90vw;
+  max-height: 60vh;
+
+  // Square grid layout
+  &--square {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(var(--cols), 1fr);
+    grid-template-rows: repeat(var(--rows), 1fr);
+  }
+
+  // Hex grid layout
+  &--hex {
+    display: grid;
+    gap: 0px 2px;
+    grid-template-columns: repeat(var(--cols), 54px);
+    grid-template-rows: repeat(var(--rows), 57px);
+    padding: 1.5rem;
+
+    .floor-tile {
+      width: 54px;
+      height: 62px;
+      min-width: unset;
+      min-height: unset;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+
+      // Offset odd rows horizontally, slight vertical overlap for hex pattern
+      $offset: 27px;
+      margin-left: calc(var(--is-odd-row) * #{$offset});
+      margin-top: calc(var(--row) * -8px);
+    }
+  }
+
+  // Individual tiles
+  &-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    min-height: 48px;
+    width: 100%;
+    height: 100%;
+    background: $tile-bg;
+    border: 2px solid $tile-border;
+    border-radius: 8px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    position: relative;
+
+    &:hover {
+      background: $tile-bg-light;
+      border-color: $tile-border-light;
+      transform: scale(1.02);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    // Exit tile styling
+    &--exit {
+      background: $exit-bg;
+      border-color: $exit-border;
+      box-shadow:
+        0 0 12px rgba(74, 156, 109, 0.3),
+        inset 0 0 20px rgba(74, 156, 109, 0.1);
+
+      &:hover {
+        background: $exit-bg-light;
+        border-color: $exit-border-light;
+      }
+    }
+
+    // Tile with direction
+    &--has-direction {
+      animation: fadeIn 0.3s ease;
+      background: $tile-bg-lighter;
+    }
+
+    // Path highlight
+    &--in-path {
+      background: color-mix(in srgb,
+          #f59e0b calc(var(--path-pos) * 100%),
+          #22c55e);
+      border-color: #fbbf24;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Footer
+footer {
+  margin-top: auto;
+  text-align: center;
+
+  p {
+    color: $text-muted;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 600px) {
+  .app {
+    padding: 1rem;
+  }
+
+  header h1 {
+    font-size: 1.5rem;
+  }
+
+  .controls {
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .floor-tile {
+    min-width: 36px;
+    min-height: 36px;
+    font-size: 1.2rem;
+  }
+}
